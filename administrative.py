@@ -1,5 +1,6 @@
 def combineJsonFiles(folderDir, destinationFileDir):
     import os
+    import json
     finalJSON = open(destinationFileDir, "w") #open the destination file with the "w" parameter to write to the file
     collectedJSON = []
     for fn in os.listdir(folderDir):

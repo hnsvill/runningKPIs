@@ -1,7 +1,4 @@
-import pandas
 import json
-from datetime import timedelta
-import numpy
 
 def getListOfDates(userID, minDistance, jsonData):
     """Inputs:
@@ -12,6 +9,8 @@ def getListOfDates(userID, minDistance, jsonData):
     
     Outputs:
     A list of sorted, unique dates the defined user met the specified constraints"""
+
+    import pandas
 
     # Load json into dataframe and format
     df = pandas.DataFrame(jsonData, columns=["user_id", "start", "distance"]) #only import the needed columns
@@ -38,6 +37,8 @@ def numberOfTimesDistanceContinued(consecutiveDaysLen, daysDistanceMet):
     Outputs:
     An integer representing the number of times a sequence of consecutiveDaysLen-number of consecutive days occured"""
 
+    from datetime import timedelta
+
     if not daysDistanceMet: #return 0 if the daysDistanceMet is nothing
         return 0
 
@@ -45,25 +46,27 @@ def numberOfTimesDistanceContinued(consecutiveDaysLen, daysDistanceMet):
     numDaysInCurrentStreak = 1 #start the counter at one to count the current day being tested in the streak
     daysDistanceMet = list(set(daysDistanceMet))
     daysDistanceMet.sort()
-    for i in range(len(streakDates)-1):  #this loop cmpares the current item with the next item, and will throw an error if you try to call a non-existent item
-        if streakDates[i+1] - timedelta(days=1) == streakDates[i]:  #if the next date is only one day ahead of the current item
+    for i in range(len(daysDistanceMet)-1):  #this loop cmpares the current item with the next item, and will throw an error if you try to call a non-existent item
+        if daysDistanceMet[i+1] - timedelta(days=1) == daysDistanceMet[i]:  #if the next date is only one day ahead of the current item
             numDaysInCurrentStreak = numDaysInCurrentStreak + 1
-        elif streakDates[i+1] - timedelta(days=1) != streakDates[i]:  #if the next date is more than one day ahead of the current item
+        elif daysDistanceMet[i+1] - timedelta(days=1) != daysDistanceMet[i]:  #if the next date is more than one day ahead of the current item
             streakSizes.append(numDaysInCurrentStreak) #append the current value to the streakSizes array
             numDaysInCurrentStreak = 1 #reset the counter
 
     return sum([int(streak/consecutiveDaysLen) for streak in streakSizes if streak >= consecutiveDaysLen]) #3 could be changed into an argument to find streaks of different lengths
-    
-        
 
+def wrapper(userID):
+    jData = json.load(open("mainJSON.json")) #import the json file with the running data
+    #load up values that the assignment did not specify to have as arguments
+    consecDays = 3
+    minDist = 1
 
-jData = json.load(open("mainJSON.json")) #import the json file with the running data
-userID = "d77908482ed2505ebbf17ef72be2f080"
-consecDays = 3
-minDist = 1
+    timesConsistent = numberOfTimesDistanceContinued(consecDays, getListOfDates(userID, minDist, jData))
+    return json.dumps({"user_id": userID, "kept_distance_consistent": timesConsistent})
 
-qualifyingDates = getListOfDates(userID, minDist, jData)
-print(numberOfTimesDistanceContinued(consecDays, qualifyingDates))
+def main():
+    userID = input("Please provide a userID: ") #takes standard input from the command line
+    print(wrapper(userID)) #prints the json returned as standard output from the wrapper function
 
-
-
+if __name__ == "__main__":
+    main()
