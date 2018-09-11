@@ -62,6 +62,7 @@ def wrapper(userID):
     minDist = 10
 
     qtyPRs = currentYearPRs(userID, minDist, jData)
+
     return json.dumps({"user_id": userID, "current_year_5k_PRs_pace": qtyPRs})
 
 def main():
